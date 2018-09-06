@@ -5,6 +5,7 @@ from channels.auth import AuthMiddlewareStack
 
 from actionlog.consumers import ActionLogEntryConsumer
 from checkins.consumers import CheckInEventConsumer
+from draw.consumers import DebateConsumer
 from results.consumers import BallotResultConsumer, BallotStatusConsumer
 
 
@@ -14,17 +15,17 @@ from results.consumers import BallotResultConsumer, BallotStatusConsumer
 
 application = ProtocolTypeRouter({
 
-    # HTTP handled automatically
-
     # WebSocket handlers
     "websocket": AuthMiddlewareStack(
         URLRouter([
             # TournamentOverviewContainer
-            url(r'^ws/(?P<tournament_slug>[-\w_]+)/action_logs/$', ActionLogEntryConsumer),
-            url(r'^ws/(?P<tournament_slug>[-\w_]+)/ballot_results/$', BallotResultConsumer),
-            url(r'^ws/(?P<tournament_slug>[-\w_]+)/ballot_statuses/$', BallotStatusConsumer),
+            url(r'^ws/<slug:tournament_slug>/action_logs/$', ActionLogEntryConsumer),
+            url(r'^ws/<slug:tournament_slug>/ballot_results/$', BallotResultConsumer),
+            url(r'^ws/<slug:tournament_slug>/ballot_statuses/$', BallotStatusConsumer),
             # CheckInStatusContainer
-            url(r'^ws/(?P<tournament_slug>[-\w_]+)/checkins/$', CheckInEventConsumer)
+            url(r'^ws/<slug:tournament_slug>/checkins/$', CheckInEventConsumer),
+            # DebateConsumer
+            url(r'^ws/<slug:tournament_slug>/<int:round_seq>/debates/$', DebateConsumer)
         ])
     ),
 })
